@@ -11,19 +11,26 @@
                             style="background-image: url(https://bootdey.com/img/Content/flores-amarillas-wallpaper.jpeg);">
                         </div>
                         <div class="author-card-profile">
-                            <div class="author-card-avatar" @click="changePic">
-                                <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="old"
+                            <div class="author-card-avatar container-upload">
+                                <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="old" id='old'
                                     alt="Daniel Adams">
                                 <div class="overlay">
                                     <img src="../assets/img/photo.png" class="photo" alt="Camera">
+
                                 </div>
                             </div>
-                            <input type="file" @change="onFileSelected" class="file" />
-                            <button @click="onUpload">Upload</button>
                             <div class="author-card-details">
                                 <h5 class="author-card-name text-lg">Daniel Adams</h5>
-                            </div>
+                            </div> 
+                            <form enctype="multipart/form-data" @submit.prevent="onSubmit" action="http://localhost/php-login-minimal-master/api/change_user_settings.php" method="POST">
+                                <!-- Поле MAX_FILE_SIZE требуется указывать перед полем загрузки файла -->
+                                <input type="hidden" name="MAX_FILE_SIZE" value="30000000" />
+                                <!-- Название элемента input определяет название элемента в суперглобальном массиве $_FILES -->
+                                Отправить файл: <input name="userfile" type="file" />
+                                <input type="submit" value="Отправить файл"   />
+                            </form>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -75,19 +82,71 @@
 
 <script>
 import { reactive } from 'vue';
-
+import axios from 'axios';
 export default {
+    name: 'imageUpload',
     data() {
         return {
+            previewImage: null,
             selectedFile: null
         }
     },
+
     methods: {
-        changePic() {
-            console.log('changePic');
+        async uploadPic(event) {
+
+
+            let data = new FormData();
+            data.append('name', 'my-picture');
+            data.append('file', event.target.files[0]);
+
+
+            await fetch('http://localhost/php-login-minimal-master/api/change_user_settings.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'multipart/form-data' },
+                body: { avatar: data }
+            })
+                .then(r => r.json()).then((data) => {
+
+
+                })
+                .catch(function (error) {
+                    alert(error);
+                });
+
+
         },
         onFileSelected(event) {
             this.selectedFile = event.target.files[0];
+        },
+        selectFile() {
+            this.file = this.$refs.file.files[0];
+
+
+
+        },
+        async sendFile() {
+
+            const formData = new FormData();
+            const reader = new FileReader();
+
+            if (this.file) {
+                reader.readAsDataURL(this.file);
+            }
+            reader.onload = (readerEvent) => {
+                formData.append("image", readerEvent.target.result);
+            };
+
+            console.log(formData.get('image'));
+            for (var pair of formData.entries()) {
+                console.log(pair[0] + ', ' + pair[1]);
+            }
+
+            try {
+                await axios.post('http://localhost/php-login-minimal-master/api/change_user_settings.php', { avatar: formData })
+            } catch (error) {
+                console.error(error);
+            }
         },
         async onUpload() {
             const fd = new FormData();
@@ -95,27 +154,26 @@ export default {
 
             localStorage.getItem('email')
 
-            await fetch('http://localhost/chat-app-php/api/change_user_settings.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(reactive({
-          email: localStorage.getItem('email'), 
-          avatar:fd
-        }))
-      })
-        .then(r => r.json()).then((data) => {
+            await fetch('http://localhost/php-login-minimal-master/api/change_user_settings.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reactive({
+                    email: localStorage.getItem('email'),
+                    avatar: fd
+                }))
+            })
+                .then(r => r.json()).then((data) => {
 
-       
-        })
-        .catch(function (error) {
-          // alert(error);
-        });
+
+                })
+                .catch(function (error) {
+                    // alert(error);
+                });
 
 
         }
     }
-
-}
+} 
 </script>
 
 <style scoped>
@@ -335,7 +393,7 @@ a.list-group-item,
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 20px;
+    left: 0;
     right: 0;
     height: 85px;
     width: 85px;
@@ -344,10 +402,12 @@ a.list-group-item,
     background-color: #008CBA;
     border-radius: 50%;
     background-color: rgba(92, 92, 92, 0.685);
+    z-index: 2;
 }
 
 .author-card-avatar:hover .overlay {
     opacity: 1;
+    cursor: pointer;
 }
 
 .photo {
@@ -360,7 +420,42 @@ a.list-group-item,
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     text-align: center;
+}
 
+/* UPLOAD FILE */
+.uploader {
+    opacity: 0;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    left: -20px;
+    right: 0;
+    height: 85px;
+    width: 85px;
+    cursor: pointer;
+}
 
+.container-upload {
+    position: relative
+}
+
+#image {
+    z-index: 10;
+}
+
+#imgInp {
+    opacity: 0;
+
+    height: 400px;
+    width: 400px;
+}
+
+#blah {
+
+    height: 400px;
+    width: 400px;
+    position: absolute;
+    z-index: 10;
 }
 </style>
