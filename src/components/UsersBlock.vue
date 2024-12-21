@@ -31,7 +31,7 @@ export default {
         const users = reactive([])
 
         onMounted(async () => {
-            await fetch('http://localhost/php-login-minimal-master/api/get_users.php', {
+            await fetch('http://51.20.254.18/dashboard/api/get_users.php', {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
 
