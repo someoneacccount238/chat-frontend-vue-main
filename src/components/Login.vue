@@ -31,7 +31,7 @@ export default {
   },
   methods: {
     async submitForm() {
-      const response = await fetch('http://localhost/php-login-minimal-master/api/login.php', {
+      const response = await fetch('https://51.20.254.18/dashboard/api/login.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

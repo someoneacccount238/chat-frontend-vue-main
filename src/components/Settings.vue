@@ -22,7 +22,7 @@
                             <div class="author-card-details">
                                 <h5 class="author-card-name text-lg">Daniel Adams</h5>
                             </div> 
-                            <form enctype="multipart/form-data" @submit.prevent="onSubmit" action="http://51.20.254.18/dashboard/api/change_user_settings.php" method="POST">
+                            <form enctype="multipart/form-data" @submit.prevent="onSubmit" action="https://51.20.254.18/dashboard/api/change_user_settings.php" method="POST">
                                 <!-- Поле MAX_FILE_SIZE требуется указывать перед полем загрузки файла -->
                                 <input type="hidden" name="MAX_FILE_SIZE" value="30000000" />
                                 <!-- Название элемента input определяет название элемента в суперглобальном массиве $_FILES -->
@@ -101,7 +101,7 @@ export default {
             data.append('file', event.target.files[0]);
 
 
-            await fetch('http://51.20.254.18/dashboard/api/change_user_settings.php', {
+            await fetch('https://51.20.254.18/dashboard/api/change_user_settings.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'multipart/form-data' },
                 body: { avatar: data }
@@ -143,7 +143,7 @@ export default {
             }
 
             try {
-                await axios.post('http://51.20.254.18/dashboard/api/change_user_settings.php', { avatar: formData })
+                await axios.post('https://51.20.254.18/dashboard/api/change_user_settings.php', { avatar: formData })
             } catch (error) {
                 console.error(error);
             }
@@ -154,7 +154,7 @@ export default {
 
             localStorage.getItem('email')
 
-            await fetch('http://51.20.254.18/dashboard/api/change_user_settings.php', {
+            await fetch('https://51.20.254.18/dashboard/api/change_user_settings.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(reactive({

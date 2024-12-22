@@ -101,7 +101,7 @@ export default {
     },
     async sendMsg() {
 
-      await fetch('http://51.20.254.18/dashboard/api/new_message.php', {
+      await fetch('https://51.20.254.18/dashboard/api/new_message.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -136,7 +136,7 @@ export default {
     },
     async changeUser() {
 
-      await fetch('http://51.20.254.18/dashboard/api/get_msg_history.php', {
+      await fetch('https://51.20.254.18/dashboard/api/get_msg_history.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
