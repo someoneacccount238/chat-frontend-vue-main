@@ -1,7 +1,6 @@
 
 <template>
-    <div>
-        <Navbar />
+    <div> 
         <Settings />
     </div>
 </template>

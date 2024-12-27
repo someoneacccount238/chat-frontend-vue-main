@@ -105,7 +105,7 @@ export default {
     },
     async sendMsg() {
 
-      await fetch('http://localhost/php-login-minimal-master/api/new_message.php', {
+      await fetch('http://localhost/chat-app-backend/api/new_message.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -139,7 +139,7 @@ export default {
     },
     async changeUser() {
 
-      await fetch('http://localhost/php-login-minimal-master/api/get_msg_history.php', {
+      await fetch('http://localhost/chat-app-backend/api/get_msg_history.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

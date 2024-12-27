@@ -1,6 +1,6 @@
 import axios from "axios";
 const instance = axios.create({
-    baseURL: `http://localhost/php-login-minimal-master`,
+    baseURL: `http://localhost/chat-app-backend`,
 });
 
 instance.interceptors.request.use((config) => {

@@ -19,7 +19,7 @@
                                 </div>
                             </div>
                             <div class="author-card-details">
-                                <h5 class="author-card-name text-lg">{{ oldUserName }}</h5>
+                                <h5 class="author-card-name text-lg" id="oldUserName">{{ oldUserName }}</h5>
                             </div>
                             <form id="imageForm" enctype="multipart/form-data" @submit.prevent="onSubmitAvatar">
                                 <!-- Поле MAX_FILE_SIZE требуется указывать перед полем загрузки файла -->
@@ -91,7 +91,8 @@ export default {
             selectedFile: null,
             pass: '',
             passConfirm: '',
-            userName: ''
+            userName: '',
+            userData: reactive([])
         }
     },
     computed: {
@@ -108,7 +109,7 @@ export default {
 
     methods: {
         async onSubmitAvatar(event) {
-            const url = 'http://localhost/php-login-minimal-master/api/upload_picture_to_server.php';
+            const url = 'http://localhost/chat-app-backend/api/upload_picture_to_server.php';
 
             const formData = new FormData();
 
@@ -126,7 +127,7 @@ export default {
                 .then(response => console.log(response.data))
                 .catch(error => console.error(error));
 
-            await fetch('http://localhost/php-login-minimal-master/api/upload_picture_to_s3.php', {
+            await fetch('http://localhost/chat-app-backend/api/upload_picture_to_s3.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(reactive({
@@ -150,7 +151,7 @@ export default {
                 return;
             }
 
-            const response = await fetch('http://localhost/php-login-minimal-master/api/change_user_settings.php', {
+            const response = await fetch('http://localhost/chat-app-backend/api/change_user_settings.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(reactive({
@@ -165,51 +166,40 @@ export default {
                 .catch(function (error) {
                     alert(error);
                 });
-        }
-    },
-    updated() {
-        this.$refs.inputRef.value = this.oldUserName;
-    },
-    setup() {
-        const userData = reactive([])
 
-        onMounted(async () => {
-            await fetch('http://localhost/php-login-minimal-master/api/get_avatar_and_username.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(reactive({
-                    email: localStorage.getItem('email')
-                }))
-
-            })
-                .then(r => r.json()).then((res) => {
-
-                    var dataObj = JSON.parse(res.message);
-
-                    for (var i in dataObj)
-                        userData.push(dataObj[i]);
-
-                    success = true
-
-
-                    console.log(userData)
-
-                })
-                .catch((error) => {
-                    //error = error.data 
-                }
-                )
-
-
-
-        })
-
-        const getImageUrl = (name) => {
+                document.getElementById("oldUserName").innerHTML = this.$refs.inputRef.value;
+        },
+        getImageUrl(name) {
             return new URL(`${name}`, import.meta.url).href
         }
+    },
+    async mounted() {
+        await fetch('http://localhost/chat-app-backend/api/get_avatar_and_username.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reactive({
+                email: localStorage.getItem('email')
+            }))
 
-        return { getImageUrl, userData }
-    }
+        })
+            .then(r => r.json()).then((res) => {
+
+                var dataObj = JSON.parse(res.message);
+
+                for (var i in dataObj)
+                    this.userData.push(dataObj[i]);
+
+                success = true
+            })
+            .catch((error) => {
+                //error = error.data 
+            }
+            )
+
+            this.$refs.inputRef.value = this.oldUserName;
+
+
+    } 
 } 
 </script>
 

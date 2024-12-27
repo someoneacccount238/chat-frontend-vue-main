@@ -34,7 +34,7 @@ export default {
 
   methods: {
     async submitForm() {
-      await fetch('http://localhost/php-login-minimal-master/api/register.php', {
+      await fetch('http://localhost/chat-app-backend/api/register.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
