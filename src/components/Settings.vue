@@ -12,22 +12,21 @@
                         </div>
                         <div class="author-card-profile">
                             <div class="author-card-avatar container-upload">
-                                <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="old" id='old'
-                                    alt="Daniel Adams">
+                                <img :src="getImageUrl(avatar)" class="old" id='old' alt="Daniel Adams">
                                 <div class="overlay">
                                     <img src="../assets/img/photo.png" class="photo" alt="Camera">
 
                                 </div>
                             </div>
                             <div class="author-card-details">
-                                <h5 class="author-card-name text-lg">Daniel Adams</h5>
-                            </div> 
-                            <form enctype="multipart/form-data" @submit.prevent="onSubmit" action="https://51.20.254.18/dashboard/api/change_user_settings.php" method="POST">
+                                <h5 class="author-card-name text-lg">{{ oldUserName }}</h5>
+                            </div>
+                            <form id="imageForm" enctype="multipart/form-data" @submit.prevent="onSubmitAvatar">
                                 <!-- Поле MAX_FILE_SIZE требуется указывать перед полем загрузки файла -->
                                 <input type="hidden" name="MAX_FILE_SIZE" value="30000000" />
                                 <!-- Название элемента input определяет название элемента в суперглобальном массиве $_FILES -->
-                                Отправить файл: <input name="userfile" type="file" />
-                                <input type="submit" value="Отправить файл"   />
+                                Отправить файл: <input name="userfile" type="file" id="imageInput" />
+                                <input type="submit" value="Отправить файл" />
                             </form>
                         </div>
 
@@ -41,26 +40,25 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="account-fn">Username</label>
-                        <input class="form-control" type="text" id="account-fn" value="Daniel" required="">
+                        <input class="form-control" type="text" id="account-fn" ref="inputRef" required="">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="account-email">E-mail Address</label>
-                        <input class="form-control" type="email" id="account-email" value="daniel.adams@example.com"
-                            disabled="">
+                        <input class="form-control" type="email" id="account-email" v-model="email" disabled="">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="account-pass">New Password</label>
-                        <input class="form-control" type="password" id="account-pass">
+                        <input class="form-control" type="password" id="account-pass" v-model="pass">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="account-confirm-pass">Confirm Password</label>
-                        <input class="form-control" type="password" id="account-confirm-pass">
+                        <input class="form-control" type="password" id="account-confirm-pass" v-model="passConfirm">
                     </div>
                 </div>
                 <div class="col-12">
@@ -69,8 +67,8 @@
                         <div class="custom-control custom-checkbox d-block">
                             <input class="custom-control-input" type="checkbox" id="subscribe_me" checked="">
                         </div>
-                        <button class="btn btn-style-1 btn-primary" type="button" data-toast=""
-                            data-toast-position="topRight" data-toast-type="success"
+                        <button id="submitForm" @click="submitForm" class="btn btn-style-1 btn-primary" type="button"
+                            data-toast="" data-toast-position="topRight" data-toast-type="success"
                             data-toast-icon="fe-icon-check-circle" data-toast-title="Success!"
                             data-toast-message="Your profile updated successfuly.">Update Profile</button>
                     </div>
@@ -83,95 +81,134 @@
 <script>
 import { reactive } from 'vue';
 import axios from 'axios';
+
+import { onMounted, getCurrentInstance } from 'vue';
 export default {
     name: 'imageUpload',
     data() {
         return {
             previewImage: null,
-            selectedFile: null
+            selectedFile: null,
+            pass: '',
+            passConfirm: '',
+            userName: ''
+        }
+    },
+    computed: {
+        email() {
+            return localStorage.getItem('email')
+        },
+        avatar() {
+            return this.userData.length > 0 ? this.userData[0].Avatar : ''
+        },
+        oldUserName() {
+            return this.userData.length > 0 ? this.userData[0].user_name : ''
         }
     },
 
     methods: {
-        async uploadPic(event) {
+        async onSubmitAvatar(event) {
+            const url = 'http://localhost/php-login-minimal-master/api/upload_picture_to_server.php';
+
+            const formData = new FormData();
+
+            const myFile = document.getElementById('imageInput').files[0];
 
 
-            let data = new FormData();
-            data.append('name', 'my-picture');
-            data.append('file', event.target.files[0]);
+
+            formData.append('image', myFile);
+
+            formData.append('email', localStorage.getItem('email'));
 
 
-            await fetch('https://51.20.254.18/dashboard/api/change_user_settings.php', {
+
+            axios.post(url, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+                .then(response => console.log(response.data))
+                .catch(error => console.error(error));
+
+            await fetch('http://localhost/php-login-minimal-master/api/upload_picture_to_s3.php', {
                 method: 'POST',
-                headers: { 'Content-Type': 'multipart/form-data' },
-                body: { avatar: data }
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reactive({
+                    email: localStorage.getItem('email')
+                }))
             })
-                .then(r => r.json()).then((data) => {
+                .then((res) => {
+                    success = true
+                })
+                .catch((error) => {
+                    // error = error.data.message
+                }
+                )
 
 
+        },
+        async submitForm() {
+            //check if pass is same in two inputs
+            if (this.pass !== this.passConfirm) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            const response = await fetch('http://localhost/php-login-minimal-master/api/change_user_settings.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reactive({
+                    email: this.email,
+                    password: this.pass,
+                    user_name: this.$refs.inputRef.value
+                }))
+            })
+                .then((data) => {
+                    alert('Profile updated successfully');
                 })
                 .catch(function (error) {
                     alert(error);
                 });
+        }
+    },
+    updated() {
+        this.$refs.inputRef.value = this.oldUserName;
+    },
+    setup() {
+        const userData = reactive([])
 
-
-        },
-        onFileSelected(event) {
-            this.selectedFile = event.target.files[0];
-        },
-        selectFile() {
-            this.file = this.$refs.file.files[0];
-
-
-
-        },
-        async sendFile() {
-
-            const formData = new FormData();
-            const reader = new FileReader();
-
-            if (this.file) {
-                reader.readAsDataURL(this.file);
-            }
-            reader.onload = (readerEvent) => {
-                formData.append("image", readerEvent.target.result);
-            };
-
-            console.log(formData.get('image'));
-            for (var pair of formData.entries()) {
-                console.log(pair[0] + ', ' + pair[1]);
-            }
-
-            try {
-                await axios.post('https://51.20.254.18/dashboard/api/change_user_settings.php', { avatar: formData })
-            } catch (error) {
-                console.error(error);
-            }
-        },
-        async onUpload() {
-            const fd = new FormData();
-            fd.append('image', this.selectedFile, this.selectedFile.name);
-
-            localStorage.getItem('email')
-
-            await fetch('https://51.20.254.18/dashboard/api/change_user_settings.php', {
+        onMounted(async () => {
+            await fetch('http://localhost/php-login-minimal-master/api/get_avatar_and_username.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(reactive({
-                    email: localStorage.getItem('email'),
-                    avatar: fd
+                    email: localStorage.getItem('email')
                 }))
-            })
-                .then(r => r.json()).then((data) => {
 
+            })
+                .then(r => r.json()).then((res) => {
+
+                    var dataObj = JSON.parse(res.message);
+
+                    for (var i in dataObj)
+                        userData.push(dataObj[i]);
+
+                    success = true
+
+
+                    console.log(userData)
 
                 })
-                .catch(function (error) {
-                    // alert(error);
-                });
+                .catch((error) => {
+                    //error = error.data 
+                }
+                )
 
 
+
+        })
+
+        const getImageUrl = (name) => {
+            return new URL(`${name}`, import.meta.url).href
         }
+
+        return { getImageUrl, userData }
     }
 } 
 </script>
@@ -457,5 +494,9 @@ a.list-group-item,
     width: 400px;
     position: absolute;
     z-index: 10;
+}
+
+#imageForm {
+    margin-top: 50px;
 }
 </style>

@@ -12,7 +12,8 @@ const store = createStore({
     state() {
         return {
             userName: '',
-            userEmail: ''
+            userEmail: '',
+            avatar: ''
         }
     }
 })

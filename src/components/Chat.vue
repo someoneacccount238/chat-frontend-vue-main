@@ -1,10 +1,9 @@
-<template>
+<template> 
   <div class="container">
-    <div class="row ">
+    <div class="row">
       <div class="col-lg-12 chat text-center services__text_large mt-5">
         <div class="col-lg-12 chat__box text-center mx-auto ">
           <div class="empty-div">
-
           </div>
           <UsersBlock v-on:changeUser="changeUser" />
 
@@ -16,17 +15,17 @@
 
           <div class="messages-chat">
 
-            <Message v-for="{ id, msg, avatar, from, to, createdAt } in historyMsgsArr" :key="id" :from="from" :to="to"
-              :photo-url="avatar" :sender="from === email" :createdAt="createdAt">
+            <Message v-for="{ id, msg,  from, to, createdAt } in historyMsgsArr" :key="id" :from="from" :to="to"
+              :photo-url="avatar" :sender="from === email" :createdAt="createdAt" >
               {{ msg }}
             </Message>
 
-            <Message v-for="{ id, msg, avatar, from, to, createdAt } in msgArr" :key="id" :from="from" :to="to"
-              :photo-url="avatar" :sender="from === email" :createdAt="createdAt">
+            <Message v-for="{ id, msg,  from, to, createdAt } in msgArr" :key="id" :from="from" :to="to"
+               :sender="from === email" :createdAt="createdAt"  >
               {{ msg }}
             </Message>
 
-            <div class="start-chat" v-if="email === ''">
+            <div class="start-chat" v-if="userName === ''">
               <img src="../assets/img/start-chat.png" class="start-chat-img" />
               <h3>Start a new chat</h3>
             </div>
@@ -61,7 +60,7 @@ import { useCookies } from "vue3-cookies";
 const { cookies } = useCookies();
 import Message from './Message.vue'
 import UsersBlock from './UsersBlock.vue'
-
+import Navbar from './Navbar.vue'
 import { inject } from 'vue'
 
 
@@ -75,7 +74,8 @@ export default {
       msgArr: [],
       email: localStorage.getItem('email'),
       fullMessage: this.userName,
-      historyMsgsArr: reactive([])
+      historyMsgsArr: reactive([]),
+      avatar:''
     };
   },
   computed: {
@@ -84,10 +84,14 @@ export default {
     },
     selectedContactEmail() {
       return this.$store.state.userEmail;
-    }
-  },
+    } 
+  }, 
   updated() {
     this.scrollToElement();
+    this.avatar = this.$store.state.avatar;
+  },
+  mounted() {
+    console.log(this.fullMessage)
   },
 
   methods: {
@@ -101,13 +105,12 @@ export default {
     },
     async sendMsg() {
 
-      await fetch('https://51.20.254.18/dashboard/api/new_message.php', {
+      await fetch('http://localhost/php-login-minimal-master/api/new_message.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify(reactive({
-          id: Number(new Date()),
-          avatar: localStorage.getItem('avatar'),
+          id: Number(new Date()), 
           msg: this.msgText,
           createdAt: new Date(),
           from: this.email,
@@ -136,7 +139,7 @@ export default {
     },
     async changeUser() {
 
-      await fetch('https://51.20.254.18/dashboard/api/get_msg_history.php', {
+      await fetch('http://localhost/php-login-minimal-master/api/get_msg_history.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -148,7 +151,7 @@ export default {
           var dataObj = JSON.parse(res.message);
 
           //BUG FIX
-          this.msgArr = []
+         // this.msgArr = []
           this.historyMsgsArr = []
 
           for (var i in dataObj)
@@ -162,25 +165,14 @@ export default {
         }
         )
     }
-  },
-  //to first contact
-  async mounted() {
-
-    const el = this.$refs.bottomEl;
-
-    if (el) {
-      // Use el.scrollIntoView() to instantly scroll to the element
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-
-  }
+  } 
 }
 
 
 </script>
 
 
-<style scoped>
+<style scoped> 
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
 @import url("https://fonts.googleapis.com/css2?family=Russo+One&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Marmelad&family=Wire+One&display=swap");

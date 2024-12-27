@@ -6,7 +6,7 @@
                 <router-link class="nav-link" style="color: #a2b8f5
 
 ; text-decoration: none;" to="/messages">
-                    <h1>{{ cookie }}</h1><i class="fa fa-home" aria-hidden="true">
+                    <h1> </h1><i class="fa fa-home" aria-hidden="true">
                     </i></router-link>
             </li>
             <li class="item item-active">
@@ -79,8 +79,8 @@ export default {
     // }
 } 
 </script>
-<style>
-.navbar{
-    position: absolute;
-    top:0 !important;
-}</style>
+<style scoped>
+.menu {
+    margin-left: 10%;
+}
+</style>

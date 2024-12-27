@@ -16,7 +16,8 @@ export default {
         changeUser() {
             this.$store.state.userName = this.name;
             this.$store.state.userEmail = this.email;
-
+            this.$store.state.avatar = this.photoUrl;
+            console.log(this.$store.state.avatar); 
             this.$emit('changeUser');
         }
     },

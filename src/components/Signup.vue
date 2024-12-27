@@ -34,7 +34,7 @@ export default {
 
   methods: {
     async submitForm() {
-      await fetch('https://51.20.254.18/dashboard/api/register.php', {
+      await fetch('http://localhost/php-login-minimal-master/api/register.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -57,8 +57,7 @@ export default {
           location.reload();
 
           if (!localStorage.getItem('email')) localStorage.setItem('email', this.email)
-          if (!localStorage.getItem('avatar')) localStorage.setItem('avatar', '../assets/img/avatars/pexels-olly-733872.png')
-
+        
         })
         .catch(function (error) {
           // alert(error);

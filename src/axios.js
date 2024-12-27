@@ -1,6 +1,6 @@
 import axios from "axios";
 const instance = axios.create({
-    baseURL: `https://51.20.254.18/dashboard`,
+    baseURL: `http://localhost/php-login-minimal-master`,
 });
 
 instance.interceptors.request.use((config) => {

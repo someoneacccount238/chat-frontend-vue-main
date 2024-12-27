@@ -19,10 +19,7 @@ import UserPreview from './UserPreview.vue'
 
 export default {
     components: { UserPreview },
-    methods: {
-        addUser() {
-            console.log(this.users)
-        },
+    methods: { 
         changeUser() {
             this.$emit('changeUser');
         }
@@ -31,7 +28,7 @@ export default {
         const users = reactive([])
 
         onMounted(async () => {
-            await fetch('https://51.20.254.18/dashboard/api/get_users.php', {
+            await fetch('http://localhost/php-login-minimal-master/api/get_users.php', {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
 
@@ -61,7 +58,7 @@ export default {
     position: absolute;
     left: 0 !important;
     overflow-y: scroll;
-    height: 500px;
+    height: auto;
     font-size: 11pt;
 
 }
